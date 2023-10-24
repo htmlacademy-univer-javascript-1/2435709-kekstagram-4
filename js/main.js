@@ -9,9 +9,9 @@ const MESSAGES = [
 ];
 const AUTHORS = ['Женек', 'Никита', 'Аня', 'Ника', 'Нонна'];
 
-const getRandomInteger = (min, max) => {
-  const lower = Math.ceil(Math.min(Math.abc(min), Math.abc(max)));
-  const upper = Math.floor(Math.min(Math.abc(min), Math.abc(max)));
+const getRandomInteger = (a, b) => {
+  const lower = Math.ceil(Math.min(a, b));
+  const upper = Math.floor(Math.max(a, b));
   const result = Math.random() * (upper - lower + 1) + lower;
   return Math.floor(result);
 };
@@ -43,3 +43,4 @@ function createComment() {
 }
 
 Array.from({length: COUNT_PHOTO}, createPhotoDiscription());
+
