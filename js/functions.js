@@ -12,7 +12,7 @@ function checkPalindrome (str) {
 
   let reverseStr = '';
   for (let i = string.length - 1; i >= 0; i = i - 1) {
-    reverseStr += string.at(i);
+    reverseStr += string[i];
   }
   if (string === reverseStr) {
     return true;
