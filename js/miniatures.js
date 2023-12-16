@@ -1,4 +1,4 @@
-import {generateObjects} from './utils.js';
+import {COUNT_PHOTO, createPhotoDiscription} from './data.js';
 
 function viewMiniatures() {
   const pictures = document.querySelector('.pictures');
@@ -7,7 +7,7 @@ function viewMiniatures() {
 
   const template = document.querySelector('#picture').content;
 
-  const datas = generateObjects();
+  const datas = Array.from({length: COUNT_PHOTO}, createPhotoDiscription());
 
   for (let i = 0; i < datas.length; i++) {
     const element = template.cloneNode(true);

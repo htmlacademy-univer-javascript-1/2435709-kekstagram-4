@@ -1,4 +1,3 @@
-import {COUNT_PHOTO, createPhotoDiscription} from './data.js';
+import {viewMiniatures} from './miniatures.js';
 
-Array.from({length: COUNT_PHOTO}, createPhotoDiscription());
-
+viewMiniatures();
