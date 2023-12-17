@@ -3,50 +3,27 @@ function viewBigPicture(objects) {
   const modal = document.querySelector('.big-picture');
   const cancel = document.querySelector('.big-picture__cancel');
 
-  const oneCommentElement = document.querySelector('.social__comment');
+  const socialComment = document.querySelector('.social__comment').cloneNode(true);
 
-  const fragment = document.createDocumentFragment();
+  const commentsElement = document.querySelector('.social__comments');
 
-  const commentCount = document.querySelector('.social__comment-count');
-  const commentsLoader = document.querySelector('.comments-loader');
+  let currentObject = {};
 
   const body = document.querySelector('body');
+
+  let endIndex = 0;
 
   for(let i = 0; i < 25; i++) {
     bigPictures[i].addEventListener('click', () => {
       modal.classList.remove('hidden');
 
-      const currentObject = objects[i];
+      currentObject = objects[i];
 
-      const img = modal.querySelector('.big-picture__img img');
-      img.setAttribute('src', currentObject.url);
+      showPicture(modal, currentObject);
 
-      const likes = modal.querySelector('.likes-count');
-      likes.textContent = currentObject.likes;
-
-      const comments = modal.querySelector('.comments-count');
-      comments.textContent = currentObject.comments.length;
-
-      for(let j = 0; j < currentObject.comments.length; j++) {
-        const currentCommentElement = oneCommentElement.cloneNode(true);
-
-        const commentImg = currentCommentElement.querySelector('img');
-        commentImg.setAttribute('src', currentObject.comments[j].avatar);
-        commentImg.setAttribute('alt', currentObject.comments[j].name);
-
-        const socialText = currentCommentElement.querySelector('.social__text');
-        socialText.textContent = currentObject.comments[j].message;
-
-        fragment.appendChild(currentCommentElement);
-      }
-
-      const commentsElement = document.querySelector('.social__comments');
       commentsElement.innerHTML = '';
 
-      commentsElement.appendChild(fragment);
-
-      commentCount.classList.add('hidden');
-      commentsLoader.classList.add('hidden');
+      endIndex = showBatchComments(currentObject, 0, socialComment);
 
       body.classList.add('modal-open');
     });
@@ -67,6 +44,62 @@ function viewBigPicture(objects) {
 
     modal.classList.add('hidden');
   });
+
+  document.querySelector('.comments-loader').addEventListener('click', () => {
+    endIndex = showBatchComments(currentObject, endIndex, socialComment);
+  });
+}
+
+function showBatchComments(currentObject, startIndex, socialComment) {
+  const pageSize = 5;
+  let endIndex = startIndex;
+
+  if(startIndex + pageSize <= currentObject.comments.length) {
+    endIndex = startIndex + pageSize;
+  } else {
+    endIndex = currentObject.comments.length;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  for(let j = startIndex; j < endIndex; j++) {
+    const currentCommentElement = socialComment.cloneNode(true);
+
+    const commentImg = currentCommentElement.querySelector('img');
+    commentImg.setAttribute('src', currentObject.comments[j].avatar);
+    commentImg.setAttribute('alt', currentObject.comments[j].name);
+
+    const socialText = currentCommentElement.querySelector('.social__text');
+    socialText.textContent = currentObject.comments[j].message;
+
+    fragment.appendChild(currentCommentElement);
+  }
+
+  const commentsElement = document.querySelector('.social__comments');
+  commentsElement.appendChild(fragment);
+
+  const commentsLoader = document.querySelector('.comments-loader');
+  if(endIndex >= currentObject.comments.length) {
+    commentsLoader.classList.add('hidden');
+  } else {
+    commentsLoader.classList.remove('hidden');
+  }
+
+  const commentCount = document.querySelector('.social__comment-count');
+  commentCount.innerHTML = `${endIndex} из <span class="comments-count">${currentObject.comments.length}</span> комментариев`;
+
+  return endIndex;
+}
+
+function showPicture(modal, currentObject) {
+  const img = modal.querySelector('.big-picture__img img');
+  img.setAttribute('src', currentObject.url);
+
+  const likes = modal.querySelector('.likes-count');
+  likes.textContent = currentObject.likes;
+
+  const comments = modal.querySelector('.comments-count');
+  comments.textContent = currentObject.comments.length;
 }
 
 export {viewBigPicture};
