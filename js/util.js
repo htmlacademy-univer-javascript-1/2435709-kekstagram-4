@@ -6,4 +6,3 @@ function getRandomInteger (a, b) {
 }
 
 export {getRandomInteger};
-
