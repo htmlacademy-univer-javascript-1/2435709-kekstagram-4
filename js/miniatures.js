@@ -1,4 +1,5 @@
 function viewMiniatures(objects) {
+
   const pictures = document.querySelector('.pictures');
 
   const docFragment = document.createDocumentFragment();
@@ -22,4 +23,5 @@ function viewMiniatures(objects) {
   }
   pictures.appendChild(docFragment);
 }
+
 export {viewMiniatures};

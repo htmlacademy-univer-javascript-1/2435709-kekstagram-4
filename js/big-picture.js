@@ -8,7 +8,7 @@ function viewBigPicture(objects) {
   let currentObject = {};
   let visibleCount = 0;
 
-  for(let i = 0; i < 25; i++) {
+  for (let i = 0; i < 25; i++) {
     bigPictures[i].addEventListener('click', () => {
       commentsElement.innerHTML = '';
       currentObject = objects[i];
