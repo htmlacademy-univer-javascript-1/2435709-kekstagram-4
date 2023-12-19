@@ -1,6 +1,57 @@
-import {SLIDER_CONST} from './slider-const.js';
+import {SLIDER_CONST_MAP} from './slider-const.js';
+import {setPost} from './api.js';
+import {validateStartSimbol, validateCorrectSimbol, validateUniqueValue, validateMaxCountValue} from './validate-functions.js';
+import {updateScale} from './image-scale.js';
 
-function initUploadImg() {
+const hiddenSlider = () => {
+  const preview = document.querySelector('.img-upload__preview');
+  preview.style.transform = '';
+  document.querySelector('.img-upload__effect-level').classList.add('hidden');
+};
+
+const hiddenForm = () => {
+  const uploadEditor = document.querySelector('.img-upload__overlay');
+  const body = document.querySelector('body');
+  const form = document.querySelector('.img-upload__form');
+
+  uploadEditor.classList.add('hidden');
+  body.classList.remove('modal-open');
+  form.reset();
+};
+
+const onSendSuccess = () => {
+  hiddenForm();
+};
+
+const onChangeEffect = (effectsRadio, sliderElement) => {
+  const preview = document.querySelector('.img-upload__preview');
+  const currentRadio = effectsRadio.value;
+
+  if(currentRadio === 'none') {
+    document.querySelector('.img-upload__effect-level').classList.add('hidden');
+    preview.style.filter = '';
+    return;
+  }
+
+  document.querySelector('.img-upload__effect-level').classList.remove('hidden');
+
+  const options = SLIDER_CONST_MAP.get(currentRadio);
+
+  sliderElement.noUiSlider.updateOptions(options);
+
+  const sliderValueElement = document.querySelector('.effect-level__value');
+
+  sliderElement.noUiSlider.on('update', () => {
+    const val = parseFloat(sliderElement.noUiSlider.get());
+
+    sliderValueElement.setAttribute('value', `${val}%`);
+    sliderValueElement.textContent = val;
+
+    preview.style.filter = `${options.filter}(${val}${options.unit})`;
+  });
+};
+
+const initUploadImg = () => {
   const loadButton = document.querySelector('.img-upload__input');
   const uploadEditor = document.querySelector('.img-upload__overlay');
   const body = document.querySelector('body');
@@ -23,9 +74,7 @@ function initUploadImg() {
   });
 
   cancel.addEventListener('click', () => {
-    uploadEditor.classList.add('hidden');
-    body.classList.remove('modal-open');
-    form.reset();
+    hiddenForm();
   });
 
   const hashtags = document.querySelector('.text__hashtags');
@@ -49,56 +98,20 @@ function initUploadImg() {
     errorTextClass: 'img-upload__field-wrapper-error-wrapper'
   });
 
-  function validateStartSimbol (value) {
-    const tags = value.trim().split(' ');
-
-    for(let i = 0; i < tags.length; i++) {
-      if(tags[i] !== '' && tags[i][0] !== '#') {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  function validateCorrectSimbol (value) {
-    const tags = value.trim().split(' ');
-
-    const hashtag = /^#[a-zа-яё0-9]{1,19}$/i;
-
-    for(let i = 0; i < tags.length; i++) {
-      if(tags[i] !== '' && hashtag.test(tags[i]) === false) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  function validateUniqueValue (value) {
-    const tags = value.trim().split(' ');
-
-    const set = new Set(tags);
-
-    return set.size === tags.length;
-  }
-
-  function validateMaxCountValue (value) {
-    const tags = value.trim().split(' ');
-
-    return tags.length <= 5;
-  }
-
   pristine.addValidator(hashtags, validateStartSimbol, 'Хэш-тег начинается с символа # (решётка)');
   pristine.addValidator(hashtags, validateCorrectSimbol, 'Строка после решётки должна состоять из букв и чисел и не может содержать пробелы, спецсимволы (#, @, $ и т. п.), символы пунктуации (тире, дефис, запятая и т. п.), эмодзи и т. д.');
   pristine.addValidator(hashtags, validateUniqueValue, 'Один и тот же хэш-тег не может быть использован дважды');
   pristine.addValidator(hashtags, validateMaxCountValue, 'Нельзя указать больше пяти хэш-тегов');
 
   form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
     const isValid = pristine.validate();
     if (!isValid) {
-      evt.preventDefault();
+      return;
     }
+
+    setPost(new FormData(evt.target), onSendSuccess);
   });
 
   const sliderElement = document.querySelector('.effect-level__slider');
@@ -111,65 +124,10 @@ function initUploadImg() {
   hiddenSlider();
 
   const effectsRadios = document.querySelectorAll('.effects__radio');
-  const preview = document.querySelector('.img-upload__preview');
 
   for(let i = 0; i < effectsRadios.length; i++) {
-    effectsRadios[i].addEventListener('change', () => {
-      const currentRadio = effectsRadios[i].value;
-
-      if(currentRadio === 'none') {
-        document.querySelector('.img-upload__effect-level').classList.add('hidden');
-        preview.style.filter = '';
-        return;
-      }
-
-      document.querySelector('.img-upload__effect-level').classList.remove('hidden');
-
-      const options = SLIDER_CONST.get(currentRadio);
-
-      sliderElement.noUiSlider.updateOptions(options);
-
-      const sliderValueElement = document.querySelector('.effect-level__value');
-
-      sliderElement.noUiSlider.on('update', () => {
-        const val = parseFloat(sliderElement.noUiSlider.get());
-
-        sliderValueElement.setAttribute('value', `${val}%`);
-        sliderValueElement.textContent = val;
-
-        preview.style.filter = `${options.filter}(${val}${options.unit})`;
-      });
-    });
+    effectsRadios[i].addEventListener('change', () => onChangeEffect(effectsRadios[i], sliderElement));
   }
-}
-
-function updateScale(scaleSize) {
-  const scaleValueElement = document.querySelector('.scale__control--value');
-
-  let currentValue = parseInt(scaleValueElement.textContent, 10);
-
-  if(scaleValueElement.textContent === '') {
-    currentValue = 100;
-  }
-
-  currentValue = currentValue + scaleSize;
-
-  if(currentValue < 25 || currentValue > 100) {
-    return;
-  }
-
-  scaleValueElement.setAttribute('value', `${currentValue}%`);
-  scaleValueElement.textContent = currentValue;
-
-  const preview = document.querySelector('.img-upload__preview');
-
-  preview.style.transform = `scale(${currentValue / 100})`;
-}
-
-function hiddenSlider() {
-  const preview = document.querySelector('.img-upload__preview');
-  preview.style.transform = '';
-  document.querySelector('.img-upload__effect-level').classList.add('hidden');
-}
+};
 
 export {initUploadImg};
