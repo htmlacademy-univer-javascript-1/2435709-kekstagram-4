@@ -19,7 +19,7 @@ const updateScale = (scaleSize) => {
   scaleValueElement.setAttribute('value', `${currentValue}%`);
   scaleValueElement.textContent = currentValue;
 
-  const preview = document.querySelector('.img-upload__preview');
+  const preview = document.querySelector('.img-upload__preview img');
 
   preview.style.transform = `scale(${currentValue / MAX_SIZE})`;
 };

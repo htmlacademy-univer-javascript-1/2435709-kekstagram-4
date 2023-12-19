@@ -13,23 +13,6 @@ const debounce = (callback, timeoutDelay) => {
   };
 };
 
-
-const updateActiveStatus = (element) => {
-  const allFilters = document.querySelectorAll('.img-filters__button');
-
-  for (let i = 0; i < allFilters.length; i++) {
-    allFilters[i].classList.remove('img-filters__button--active');
-  }
-
-  element.classList.add('img-filters__button--active');
-};
-
-const onDefaultFilterClick = (evt) => {
-  updateActiveStatus(evt.target);
-
-  viewMiniatures(savedObjects);
-};
-
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -37,13 +20,29 @@ const shuffleArray = (array) => {
   }
 };
 
-const onRandomFilterClick = (evt) => {
-  updateActiveStatus(evt.target);
+const updateActiveStatus = (element) => {
+  const activeElement = document.querySelector('.img-filters__button--active');
+  activeElement.classList.remove('img-filters__button--active');
 
+  element.classList.add('img-filters__button--active');
+};
+
+const setDebounce = debounce(viewMiniatures, TIMEOUT_DELAY);
+
+const viewFilterResult = (target, objects) => {
+  updateActiveStatus(target);
+  setDebounce(objects);
+};
+
+const onDefaultFilterClick = (evt) => {
+  viewFilterResult(evt.target, savedObjects);
+};
+
+const onRandomFilterClick = (evt) => {
   const randomizeObjects = savedObjects.slice(0, savedObjects.length);
   shuffleArray(randomizeObjects);
 
-  viewMiniatures(randomizeObjects.slice(0, RANDOM_COUNT));
+  viewFilterResult(evt.target, randomizeObjects.slice(0, RANDOM_COUNT));
 };
 
 const onDiscussedFilterClick = (evt) => {
@@ -60,25 +59,24 @@ const onDiscussedFilterClick = (evt) => {
     return 0;
   });
 
-  updateActiveStatus(evt.target);
-
-  viewMiniatures(sortedObjects);
+  viewFilterResult(evt.target, sortedObjects);
 };
 
 const viewFilter = (objects) => {
   savedObjects = objects;
 
   const filter = document.querySelector('.img-filters');
-
-  filter.classList.remove('img-filters--inactive');
-
   const defaultFilterButton = document.querySelector('#filter-default');
   const RandomFilterButton = document.querySelector('#filter-random');
   const discussedFilterButton = document.querySelector('#filter-discussed');
 
-  defaultFilterButton.addEventListener('click', debounce(onDefaultFilterClick, TIMEOUT_DELAY));
-  RandomFilterButton.addEventListener('click', debounce(onRandomFilterClick, TIMEOUT_DELAY));
-  discussedFilterButton.addEventListener('click', debounce(onDiscussedFilterClick, TIMEOUT_DELAY));
+  if(savedObjects !== undefined && savedObjects.length > 0) {
+    filter.classList.remove('img-filters--inactive');
+  }
+
+  defaultFilterButton.addEventListener('click', (env) => onDefaultFilterClick(env));
+  RandomFilterButton.addEventListener('click', (env) => onRandomFilterClick(env));
+  discussedFilterButton.addEventListener('click', (env) => onDiscussedFilterClick(env));
 };
 
 export {viewFilter};

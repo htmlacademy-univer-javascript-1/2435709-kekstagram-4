@@ -16,7 +16,7 @@ const getPosts = (onSuccess) =>
       showErrorNotification(ErrorText.GET_DATA);
     });
 
-const setPost = (data, onSuccess) =>
+const setPost = (data, onSuccess, onFail) =>
   fetch('https://29.javascript.pages.academy/kekstagram',
     {
       method: 'POST',
@@ -27,6 +27,7 @@ const setPost = (data, onSuccess) =>
         onSuccess();
         showSuccessNotification();
       } else {
+        onFail();
         showErrorNotification(ErrorText.SEND_DATA);
       }
     })
