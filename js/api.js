@@ -8,7 +8,10 @@ const ErrorText = {
 const getPosts = (onSuccess) =>
   fetch('https://29.javascript.pages.academy/kekstagram/data')
     .then((response) => response.json())
-    .then((data) => onSuccess(data))
+    .then((data) => {
+      onSuccess(data);
+      return data;
+    })
     .catch(() => {
       showErrorNotification(ErrorText.GET_DATA);
     });

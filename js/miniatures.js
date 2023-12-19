@@ -1,11 +1,20 @@
 import {viewPicture} from './picture.js';
 
 const viewMiniatures = (objects) => {
+  const onListClick = (evt) => {
+    const currentObject = objects.find((item) => item.id === parseInt(evt.target.id, 10));
+
+    viewPicture(currentObject);
+  };
+
   const pictures = document.querySelector('.pictures');
 
   const docFragment = document.createDocumentFragment();
 
   const template = document.querySelector('#picture').content;
+
+  pictures.innerHTML = '';
+  pictures.removeEventListener('click', onListClick);
 
   for (let i = 0; i < objects.length; i++) {
     const element = template.cloneNode(true);
@@ -26,12 +35,6 @@ const viewMiniatures = (objects) => {
   }
 
   pictures.appendChild(docFragment);
-
-  const onListClick = (evt) => {
-    const currentObject = objects.find((item) => item.id === parseInt(evt.target.id, 10));
-
-    viewPicture(currentObject);
-  };
 
   pictures.addEventListener('click', onListClick);
 };
