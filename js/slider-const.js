@@ -1,4 +1,4 @@
-const SLIDER_CONST = new Map([
+const SLIDER_CONST_MAP = new Map([
   ['chrome',
     {
       filter: 'grayscale',
@@ -52,4 +52,4 @@ const SLIDER_CONST = new Map([
   }]
 ]);
 
-export {SLIDER_CONST};
+export {SLIDER_CONST_MAP};
