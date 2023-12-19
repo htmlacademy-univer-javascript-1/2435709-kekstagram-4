@@ -1,42 +1,52 @@
 import {viewPicture} from './picture.js';
 
-const viewMiniatures = (objects) => {
-  const onListClick = (evt) => {
-    const currentObject = objects.find((item) => item.id === parseInt(evt.target.id, 10));
+const removePicture = () => {
+  const allPictures = document.querySelectorAll('.picture');
+  allPictures.forEach((picture) => {
+    picture.remove();
+  });
+};
 
-    viewPicture(currentObject);
+const viewMiniatures = (objects) => {
+  removePicture();
+
+  const onPictureClick = (evt) => {
+    const pictureImage = evt.target.closest('.picture')?.querySelector('.picture__img');
+
+    if(pictureImage !== undefined && pictureImage !== null) {
+      const currentObject = objects.find((item) => item.id === parseInt(pictureImage.id, 10));
+
+      viewPicture(currentObject);
+    }
   };
 
   const pictures = document.querySelector('.pictures');
+  const template = document.querySelector('#picture').content;
+  pictures.removeEventListener('click', onPictureClick);
 
   const docFragment = document.createDocumentFragment();
 
-  const template = document.querySelector('#picture').content;
-
-  pictures.innerHTML = '';
-  pictures.removeEventListener('click', onListClick);
-
-  for (let i = 0; i < objects.length; i++) {
+  objects.map((object) => {
     const element = template.cloneNode(true);
 
-    const img = element.querySelector('.picture__img');
+    const imageElement = element.querySelector('.picture__img');
 
-    img.setAttribute('src', objects[i].url);
-    img.setAttribute('alt', objects[i].description);
-    img.setAttribute('id', objects[i].id);
+    imageElement.setAttribute('src', object.url);
+    imageElement.setAttribute('alt', object.description);
+    imageElement.setAttribute('id', object.id);
 
     const likes = element.querySelector('.picture__likes');
-    likes.textContent = objects[i].likes;
+    likes.textContent = object.likes;
 
     const comments = element.querySelector('.picture__comments');
-    comments.textContent = objects[i].comments.length;
+    comments.textContent = object.comments.length;
 
     docFragment.appendChild(element);
-  }
+  });
 
   pictures.appendChild(docFragment);
 
-  pictures.addEventListener('click', onListClick);
+  pictures.addEventListener('click', onPictureClick);
 };
 
 export {viewMiniatures};
