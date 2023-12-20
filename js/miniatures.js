@@ -11,7 +11,7 @@ const viewMiniatures = (objects) => {
   removePicture();
 
   const onPictureClick = (evt) => {
-    const pictureImage = evt.target.closest('.picture')?.querySelector('.picture__img');
+    const pictureImage = evt.target.closest('.picture').querySelector('.picture__img');
 
     if(pictureImage !== undefined && pictureImage !== null) {
       const currentObject = objects.find((item) => item.id === parseInt(pictureImage.id, 10));
