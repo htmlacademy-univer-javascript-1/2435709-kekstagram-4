@@ -37,4 +37,4 @@ extractNumbers('2023 год');
 extractNumbers('ECMAScript 2022');
 extractNumbers('1 кефир, 0.5 батона');
 extractNumbers('агент 007');
-extractNumbers('а я  томат');
+extractNumbers('а я томат');
